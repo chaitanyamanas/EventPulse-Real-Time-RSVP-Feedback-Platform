@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  role          Role      @default(USER)
+  events        Event[]   @relation("HostEvents")
+  rsvps         RSVP[]    @relation("AttendeeRSVPs")
+  feedbacks     Feedback[] @relation("UserFeedbacks")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  dateTime      DateTime
+  location      String
+  rsvpDeadline  DateTime
+  maxAttendees  Int?
+  host          User      @relation("HostEvents", fields: [hostId], references: [id])
+  hostId        String
+  status        EventStatus @default(SCHEDULED)
+  rsvps         RSVP[]    @relation("EventRSVPs")
+  feedback      Feedback[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model RSVP {
+  id        String   @id @default(cuid())
+  event     Event    @relation("EventRSVPs", fields: [eventId], references: [id])
+  eventId   String
+  user      User     @relation("AttendeeRSVPs", fields: [userId], references: [id])
+  userId    String
+  checkedIn Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  user      User     @relation("UserFeedbacks", fields: [userId], references: [id])
+  userId    String
+  content   String
+  emoji     String?
+  pinned    Boolean  @default(false)
+  flagged   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  HOST
+}
+
+enum EventStatus {
+  SCHEDULED
+  LIVE
+  CLOSED
+}
