@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUser } from "@/lib/auth";
@@ -74,6 +76,12 @@ export default function Register() {
             </button>
           </div>
         </form>
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <a href="/auth/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Sign in
+          </a>
+        </p>
       </div>
     </div>
   );

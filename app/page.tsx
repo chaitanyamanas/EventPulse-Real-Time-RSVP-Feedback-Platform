@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import LoginButtonWrapper from "./components/LoginButtonWrapper";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -23,13 +22,27 @@ export default async function Home() {
             Your real-time RSVP and feedback platform for events
           </p>
 
-          <div className="flex justify-center gap-4">
-            <LoginButtonWrapper />
+          <div className="flex justify-center gap-6">
+            <Link
+              href="/auth/login"
+              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Sign In
+            </Link>
             <Link
               href="/auth/register"
-              className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               Register
+            </Link>
+          </div>
+
+          <div className="mt-8">
+            <Link
+              href="/test"
+              className="text-blue-500 hover:text-blue-600"
+            >
+              Go to Test Page
             </Link>
           </div>
 

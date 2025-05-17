@@ -8,6 +8,27 @@ import type { NextAuthOptions } from "next-auth";
 
 const prisma = new PrismaClient();
 
+// Create a test user if it doesn't exist
+async function createTestUser() {
+  const testUser = await prisma.user.findUnique({
+    where: { email: "test@example.com" }
+  });
+
+  if (!testUser) {
+    const hashedPassword = await bcrypt.hash("test1234", 10);
+    await prisma.user.create({
+      data: {
+        email: "test@example.com",
+        password: hashedPassword,
+        name: "Test User",
+      },
+    });
+  }
+}
+
+// Create test user on startup
+createTestUser();
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
