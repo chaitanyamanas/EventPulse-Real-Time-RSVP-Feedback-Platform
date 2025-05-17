@@ -1,23 +1,35 @@
 'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createUser } from "@/lib/auth";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Register() {
+  const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
     try {
-      await createUser({ email, password, name });
-      router.push("/auth/login");
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Registration failed');
+      }
+
+      router.push('/auth/login');
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError('An error occurred during registration');
     }
   };
 
@@ -72,7 +84,7 @@ export default function Register() {
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Create Account
+              Register
             </button>
           </div>
         </form>

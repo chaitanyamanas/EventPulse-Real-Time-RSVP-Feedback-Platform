@@ -1,72 +1,71 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import Link from 'next/link';
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-
-  if (session) {
-    // If user is logged in, redirect to dashboard
-    redirect("/dashboard");
-  }
-
+export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to EventPulse
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Your real-time RSVP and feedback platform for events
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex flex-col items-center justify-center p-4">
+      <div className="text-center max-w-3xl">
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">Welcome to EventPulse</h1>
+        <p className="text-xl text-gray-600 mb-8">
+          The real-time RSVP and feedback platform for your events
+        </p>
+        
+        <div className="flex flex-col items-center mb-10">
+          <p className="mb-6 text-lg border-l-4 border-indigo-500 pl-4 bg-indigo-50 p-3 text-left">
+            <strong>Test Accounts:</strong> <br />
+            • Regular User: <code className="bg-gray-100 px-1">test@example.com</code> / <code className="bg-gray-100 px-1">test1234</code><br />
+            • Host: <code className="bg-gray-100 px-1">host@example.com</code> / <code className="bg-gray-100 px-1">test1234</code><br />
+            • Admin: <code className="bg-gray-100 px-1">admin@example.com</code> / <code className="bg-gray-100 px-1">test1234</code>
           </p>
-
-          <div className="flex justify-center gap-6">
-            <Link
-              href="/auth/login"
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/auth/register"
-              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-            >
-              Register
-            </Link>
-          </div>
-
-          <div className="mt-8">
-            <Link
-              href="/test"
-              className="text-blue-500 hover:text-blue-600"
-            >
-              Go to Test Page
-            </Link>
-          </div>
-
-          <div className="mt-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Features
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-white rounded-lg shadow">
-                <h3 className="text-xl font-semibold mb-2">Event Management</h3>
-                <p>Create and manage your events with ease</p>
-              </div>
-              <div className="p-6 bg-white rounded-lg shadow">
-                <h3 className="text-xl font-semibold mb-2">Real-time RSVP</h3>
-                <p>Track RSVPs in real-time with instant updates</p>
-              </div>
-              <div className="p-6 bg-white rounded-lg shadow">
-                <h3 className="text-xl font-semibold mb-2">Live Feedback</h3>
-                <p>Get instant feedback from your attendees</p>
-              </div>
+        </div>
+        
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link
+            href="/auth/login"
+            className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/auth/register"
+            className="px-6 py-3 bg-white text-indigo-600 font-medium rounded-lg border border-indigo-600 hover:bg-indigo-50 transition-colors"
+          >
+            Register
+          </Link>
+          <Link
+            href="/auth/direct-login"
+            className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Direct Login (For Testing)
+          </Link>
+        </div>
+      </div>
+      
+      <div className="mt-16 text-center">
+        <h2 className="text-2xl font-semibold mb-4">How it works</h2>
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl">
+          <div className="p-4">
+            <div className="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <span className="text-indigo-600 font-bold">1</span>
             </div>
+            <h3 className="font-medium text-lg mb-2">Create Events</h3>
+            <p className="text-gray-600">Easily create and manage your events with our intuitive interface</p>
+          </div>
+          <div className="p-4">
+            <div className="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <span className="text-indigo-600 font-bold">2</span>
+            </div>
+            <h3 className="font-medium text-lg mb-2">Send Invitations</h3>
+            <p className="text-gray-600">Share your event with attendees with just a few clicks</p>
+          </div>
+          <div className="p-4">
+            <div className="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <span className="text-indigo-600 font-bold">3</span>
+            </div>
+            <h3 className="font-medium text-lg mb-2">Collect Feedback</h3>
+            <p className="text-gray-600">Get real-time responses and feedback from your attendees</p>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

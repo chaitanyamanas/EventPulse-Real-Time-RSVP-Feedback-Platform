@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-export default function Login() {
+export default function DirectLogin() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,30 +18,31 @@ export default function Login() {
     setDebugInfo(null);
 
     try {
-      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+      console.log("Attempting direct login with:", { email });
       
-      console.log("Attempting login with:", { email, callbackUrl });
-      
-      const result = await signIn('credentials', {
-        redirect: false,
-        email,
-        password,
-        callbackUrl,
+      const res = await fetch('/api/login-test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
-
-      console.log("Login result:", result);
-      setDebugInfo(result);
-
-      if (result?.error) {
-        setError(`Login failed: ${result.error}`);
+      
+      const data = await res.json();
+      console.log("Login response:", data);
+      setDebugInfo(data);
+      
+      if (!res.ok || !data.success) {
+        setError(data.error || 'Login failed');
         setIsLoading(false);
         return;
       }
 
-      if (result?.ok) {
-        router.push(callbackUrl);
-        router.refresh();
-      }
+      // Store user in sessionStorage for demo purposes
+      sessionStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
     } catch (err) {
       console.error("Login error:", err);
       setDebugInfo(err);
@@ -64,10 +63,10 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Direct Login (Bypasses NextAuth)
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Use one of our test accounts or create your own
+            Alternative login method for testing
           </p>
         </div>
         
@@ -133,14 +132,13 @@ export default function Login() {
           <div className="text-xs text-gray-500">
             <p>All test accounts use password: test1234</p>
           </div>
+          
+          <div className="text-xs text-center mt-2">
+            <a href="/auth/login" className="text-indigo-600 hover:text-indigo-500">
+              Try standard NextAuth login instead
+            </a>
+          </div>
         </form>
-        
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
-          <a href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Register now
-          </a>
-        </p>
         
         {debugInfo && (
           <div className="mt-4 p-3 bg-gray-100 rounded-md text-xs overflow-auto max-h-48">
@@ -151,4 +149,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
+} 

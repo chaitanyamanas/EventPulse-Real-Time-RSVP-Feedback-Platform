@@ -1,28 +1,30 @@
-import { withAuth } from "next-auth/middleware";
+import { NextResponse } from 'next/server'
+import { withAuth } from 'next-auth/middleware'
 
-export default withAuth({
-  callbacks: {
-    authorized: ({ token }) => !!token,
+export default withAuth(
+  function middleware(req) {
+    // Clear any problematic redirect loops by checking the referrer
+    const { pathname, search } = req.nextUrl
+    
+    // Handle problematic redirect chains
+    if (search && search.includes('%252F')) {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+    
+    return NextResponse.next()
   },
-});
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+  }
+)
 
+// Specify which paths to apply the middleware to
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
-};
-# Remove the existing migrations directory
-rm -rf prisma/migrations
-
-# Create a new one
-mkdir -p prisma/migrations
-
-# Generate a new migration
-DATABASE_URL="postgresql://eventpulse_user:eventpulse_password@localhost:5432/eventpulse" npx prisma migrate dev --name init
+    '/dashboard/:path*',
+    '/api/auth/:path*', 
+    '/profile/:path*',
+  ]
+}
