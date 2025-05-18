@@ -26,5 +26,6 @@ export const config = {
     '/dashboard/:path*',
     '/api/auth/:path*', 
     '/profile/:path*',
+    '/events/:path*',  // Add protection for events routes
   ]
 }

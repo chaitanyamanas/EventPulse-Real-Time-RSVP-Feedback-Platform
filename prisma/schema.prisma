@@ -1,3 +1,5 @@
+// This is your Prisma schema file
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -9,15 +11,21 @@ generator client {
 
 model User {
   id            String    @id @default(cuid())
+  name          String?
   email         String    @unique
   password      String
-  name          String?
-  role          Role      @default(USER)
-  events        Event[]   @relation("HostEvents")
-  rsvps         RSVP[]    @relation("AttendeeRSVPs")
-  feedbacks     Feedback[] @relation("UserFeedbacks")
+  role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  hostedEvents  Event[]   @relation("HostedEvents")
+  rsvps         RSVP[]
+  feedback      Feedback[]
+}
+
+enum UserRole {
+  USER
+  HOST
+  ADMIN
 }
 
 model Event {
@@ -25,55 +33,62 @@ model Event {
   title         String
   description   String
   dateTime      DateTime
+  timezone      String
   location      String
   rsvpDeadline  DateTime
-  maxAttendees  Int?
-  host          User      @relation("HostEvents", fields: [hostId], references: [id])
-  hostId        String
+  maxAttendees  Int
   status        EventStatus @default(SCHEDULED)
-  rsvps         RSVP[]    @relation("EventRSVPs")
-  feedback      Feedback[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-model RSVP {
-  id        String   @id @default(cuid())
-  event     Event    @relation("EventRSVPs", fields: [eventId], references: [id])
-  eventId   String
-  user      User     @relation("AttendeeRSVPs", fields: [userId], references: [id])
-  userId    String
-  checkedIn Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([eventId, userId])
-}
-
-model Feedback {
-  id        String   @id @default(cuid())
-  event     Event    @relation(fields: [eventId], references: [id])
-  eventId   String
-  user      User     @relation("UserFeedbacks", fields: [userId], references: [id])
-  userId    String
-  rating    Int
-  comment   String
-  emoji     String?
-  pinned    Boolean  @default(false)
-  flagged   Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@unique([eventId, userId])
-}
-
-enum Role {
-  USER
-  HOST
-  ADMIN
+  hostId        String
+  host          User      @relation("HostedEvents", fields: [hostId], references: [id])
+  rsvps         RSVP[]
+  feedback      Feedback[]
 }
 
 enum EventStatus {
   SCHEDULED
   LIVE
   CLOSED
+}
+
+model RSVP {
+  id            String    @id @default(cuid())
+  userId        String
+  eventId       String
+  status        RSVPStatus @default(CONFIRMED)
+  checkedIn     Boolean   @default(false)
+  checkedInAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id])
+  event         Event     @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+enum RSVPStatus {
+  CONFIRMED
+  CANCELLED
+  WAITLIST
+}
+
+model Feedback {
+  id            String    @id @default(cuid())
+  userId        String
+  eventId       String
+  comment       String?
+  reaction      Reaction?
+  isPinned      Boolean   @default(false)
+  isFlagged     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id])
+  event         Event     @relation(fields: [eventId], references: [id])
+}
+
+enum Reaction {
+  THUMBS_UP
+  THUMBS_DOWN
+  HEART
+  SURPRISE
 }
